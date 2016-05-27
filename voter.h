@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
+#include <stdexcept>
 using namespace std;
+
+class voteException : public exception {};
 
 class voter {
 	string name;
@@ -8,8 +11,9 @@ class voter {
 	public:
 	voter();
 	voter(string Name);
-	void toVote(string v);
+	void toVote(string voteName);
 	string getVote();
+	string getName();
 	~voter();
 };
 
