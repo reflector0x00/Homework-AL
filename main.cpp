@@ -135,7 +135,21 @@ int main() {
 			}
 			polls.erase(polls.begin() + ind1);
 		}
-		else if(line=="delete") {}
+		else if(line=="delete") {
+			int ind = -1;
+			ss >> line;
+			for(size_t i=0; i<polls.size(); i++) {
+				if(polls[i].getName()==line) {
+					ind = i;
+					break;
+				}
+			}
+			if(ind==-1) {
+				cout << "Poll not found" << endl;
+				continue;
+			}
+			polls.erase(polls.begin() + ind);
+		}
 		else if(line=="register") {}
 		else if(line=="recall") {}
 		else if(line=="init") {}
