@@ -108,7 +108,33 @@ int main() {
 			}
 			polls.push_back(poll(line));
 		}
-		else if(line=="merge") {}
+		else if(line=="merge") {
+			size_t ind1 = -1;
+			size_t ind2 = -1;
+			string line2;
+			ss >> line >> line2;
+			for(size_t i=0; i<polls.size(); i++) {
+				if(polls[i].getName()==line) 
+					ind1 = i;
+				else if(polls[i].getName()==line2) 
+					ind2 = i;
+				if((ind1!=-1)&&(ind2!=-1))
+					break;
+				
+			}
+			if(ind1==-1) {
+				cout << "First poll not found" << endl;
+				continue;
+			}
+			else if(ind2==-1) {
+				cout << "Second poll not found" << endl;
+				continue;
+			}
+			for(size_t i=0; i<polls[ind1].size(); i++) {
+				polls[ind2].push_back(polls[ind1][i]);
+			}
+			polls.erase(polls.begin() + ind1);
+		}
 		else if(line=="delete") {}
 		else if(line=="register") {}
 		else if(line=="recall") {}
