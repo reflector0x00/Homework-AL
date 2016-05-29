@@ -28,6 +28,7 @@ class poll : public vector<voter> {
 poll::poll() : vector<voter>(), name("") {}
 poll::poll(const poll& o) : vector<voter>(o), name(o.name) {}
 poll::poll(string Name) : vector<voter>(), name(Name) {}
+
 string poll::getName() {
 	return name;
 }
@@ -63,17 +64,50 @@ int main() {
 				continue;
 			}
 			ss >> line;
-			for(size_t i=0; i<polls.size(); i++) {
-				if(polls[i].getIndex(line)!=-1) {
-					cout << "Voter allready exists" << endl;
-					continue;
-				}
+			size_t i;
+			for(i=0; i<polls.size(); i++) {
+				if(polls[i].getIndex(line)!=-1)
+					break;
+			}
+			if(i!=polls.size()) {
+				cout << "Voter allready exists" << endl;
+				continue;
 			}
 			polls[ind].push_back(voter(line));
 		}
-		else if(line=="list") {}
-		else if(line=="remove") {}
-		else if(line=="create") {}
+		else if(line=="remove") {
+			size_t ind;
+			ss >> line;
+			for(size_t i=0; i<polls.size(); i++) { 
+				ind = polls[i].getIndex(line);
+				if(ind!=-1) {
+					polls[i].erase(polls[i].begin() + ind);
+					break;
+				}
+			}
+			if(ind==-1) 
+				cout << "Voter not found" << endl;
+		}
+		else if(line=="list") {
+			for(size_t i=0; i<polls.size(); i++) {
+				cout << polls[i].getName() << ':' << endl;
+				for(size_t j=0; j<polls[i].size(); j++)
+					cout << '\t' << polls[i][j].getName() << endl;
+			}
+		}
+		else if(line=="create") {
+			ss >> line;
+			size_t i;
+			for(i=0; i<polls.size(); i++) { 
+				if(polls[i].getName()==line) 
+					break;
+			}
+			if(i!=polls.size()) {
+				cout << "Poll already exists" << endl;
+				continue;
+			}
+			polls.push_back(poll(line));
+		}
 		else if(line=="merge") {}
 		else if(line=="delete") {}
 		else if(line=="register") {}
@@ -86,6 +120,11 @@ int main() {
 		else if(line=="stats") {}
 		else if(line=="stat") {}
 		else if(line=="help") {}
-		else {}
+		else if(line=="quit") 
+			break;
+		else {
+			cout << "Unknown command" << endl;
+		}
 	}
+	return 0;
 }
