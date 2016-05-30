@@ -23,6 +23,7 @@ class poll : public vector<voter> {
 	poll(string Name);
 	string getName();
 	int getIndex(string VoterName);
+	~poll();
 };
 
 poll::poll() : vector<voter>(), name("") {}
@@ -40,9 +41,83 @@ int poll::getIndex(string VoterName) {
 	return -1;
 }
 
+poll::~poll() {}
+
+class electionException : public exception {};
+
+class election : public vector<voter*> {
+	size_t state;
+	size_t *votes;
+	size_t maximum;
+	public:
+	election();
+	election(const election& o);
+	int getIndex(string VoterName);
+	void start();
+	size_t* finish(size_t& n);
+	size_t getState();
+	size_t getMaximum();
+	~election();
+};
+
+election::election() : vector<voter*>(), stat(0), votes(nullptr), maximum(0) {}
+election::election(const election& o) : vector<voter*>(o), stat(0), votes(nullptr), maximum(0) {}
+int election::getIndex(string VoterName) {
+	for(size_t i = 0; i<size(); i++) {
+		if((*this)[i]->getName()==VoterName)
+			return i;
+	}
+	return -1;
+}
+
+void election::start() {
+	if(state!=0) 
+		throw electionException();
+	state = 1;
+	votes = new size_t[size()];
+	memset(votes, 0, size()*sizeof(size_t));
+}
+
+size_t* election::finish(size_t& n) {
+	if(state!=1) 
+		throw electionException();
+	state = 2;
+	
+	for(size_t i=0; i<size(); i++) {
+		if(votes[i]>maximum) 
+			maximum = votes[i];
+	}
+	if(maximum==0)
+		return nullptr;
+	vector <size_t> inds;
+	for(size_t i=0; i<size(); i++) {
+		if(votes[i]==maximum)
+			inds.push_back(i);
+	}
+	size_t* winners = new size_t[inds.size()];
+	for(size_t i=0; i<inds.size(); i++) 
+		winners[i] = inds[i];
+	n = nds.size();
+	return winners;
+}
+
+size_t election::getState() {
+	return state;
+}
+
+size_t election::getMaximum() {
+	return maximum;
+}
+
+
+election::~election() {
+	if(votes!=nullptr)
+		delete [] votes;
+}
 
 int main() {
 	vector<poll> polls;
+	election* current = nullptr;
 	string line;
 	printcopyright();
 	while(1) {
@@ -150,13 +225,127 @@ int main() {
 			}
 			polls.erase(polls.begin() + ind);
 		}
-		else if(line=="register") {}
-		else if(line=="recall") {}
-		else if(line=="init") {}
-		else if(line=="start") {}
-		else if(line=="finish") {}
-		else if(line=="reset") {}
-		else if(line=="vote") {}
+		else if(line=="register") {
+			if(current==nullptr) {
+				cout << "There isn't election" << endl;
+				continue;
+			}
+			size_t ind;
+			ss >> line;
+			for(size_t i=0; i<polls.size(); i++) { 
+				ind = polls[i].getIndex(line);
+				if(ind!=-1) {
+					current->push_back(&polls[i][ind]);
+					break;
+				}
+			}
+			if(ind==-1) 
+				cout << "Voter not found" << endl;
+			
+		}
+		else if(line=="recall") {
+			if(current==nullptr) {
+				cout << "There isn't election" << endl;
+				continue;
+			}
+			ss >> line;
+			size_t ind = current->getIndex(line);
+			if(ind!=-1)
+				current->erase(current->begin() + ind);
+			else 
+				cout << "Candidte not found" << endl;
+		}
+		else if(line=="init") {
+			if(current!=nullptr) {
+				cout << "Election already exists" << endl;
+				continue;
+			}
+		}
+		else if(line=="start") {
+			if(current==nullptr) {
+				cout << "There isn't election" << endl;
+				continue;
+			}
+			if(current->size()==0) {
+				cout << "There aren't any candidtes" << endl;
+				continue;
+			}
+			try {
+				current->start();
+			} catch(electionException e) {
+				cout << "Election is already started or finished" << endl;
+				continue;
+			}
+		}
+		else if(line=="finish") {
+			if(current==nullptr) {
+				cout << "There isn't election" << endl;
+				continue;
+			}
+			try {
+				size_t n;
+				size_t* winners = current->finish(n);
+				if(winners==nullptr) {
+					cout << "But nobody voted, so nobody won" << endl;
+				}
+				if(n==1) {
+					cout << (*current)[winners[0]].getName() << " won" << endl;
+				}
+				else {
+					cout << "Winners are: " << endl;
+					for(size_t i=0; i<n; i++)
+						cout << '\t' << (*current)[winners[i]].getName() << endl;
+				}
+			} catch(electionException e) {
+				cout << "Election isn't started or already finished" << endl;
+				continue;
+			}
+		}
+		else if(line=="reset") {
+			if(current==nullptr) {
+				cout << "There isn't election" << endl;
+				continue;
+			}
+			delete current;
+			current = nullptr;
+		}
+		else if(line=="vote") {
+			if(current==nullptr) {
+				cout << "There isn't election" << endl;
+				continue;
+			}
+			size_t ind1 = -1;
+			size_t ind2 = -1;
+			string line2;
+			ss >> line >> line2;
+			for(size_t i=0; i<current->size(); i++) 
+				if((*current)[i]->getName()==line2) { 
+					ind2 = i;
+					break;
+				}
+			else if(ind2==-1) {
+				cout << "Candidate not found" << endl;
+				continue;
+			}
+			for(size_t i=0; i<polls.size(); i++) {
+				ind1 = polls[i].getIndex(line);
+				if(ind1!=-1)  {
+					try {
+						polls[i][ind1].toVote(line2);
+					} catch(voteException e) {
+						cout << line1 << " already voted" << endl;
+					}
+					break;
+				}
+			}
+			if(ind1==-1) {
+				cout << "Voter not found" << endl;
+				continue;
+			}
+		}
+		else if(line=="stats") {
+			
+		}
 		else if(line=="stats") {}
 		else if(line=="stat") {}
 		else if(line=="help") {}

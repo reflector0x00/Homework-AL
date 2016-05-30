@@ -15,8 +15,6 @@ void voter::toVote(string voteName) {
 	vote = voteName;
 }
 string voter::getVote() {
-	if(vote=="")
-		throw voteException();
 	return vote;
 }
 string voter::getName() {
