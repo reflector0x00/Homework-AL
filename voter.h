@@ -14,6 +14,7 @@ class voter {
 	void toVote(string voteName);
 	string getVote();
 	string getName();
+	void reset();
 	~voter();
 };
 

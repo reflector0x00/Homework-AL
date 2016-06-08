@@ -20,6 +20,9 @@ string voter::getVote() {
 string voter::getName() {
 	return name;
 }
+void voter::reset() {
+	vote="";
+}
 voter::~voter() {
 	
 }
