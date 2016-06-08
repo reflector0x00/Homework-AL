@@ -6,7 +6,9 @@
 #define VSVERSION "0.1.0" 
 using namespace std;
 
-
+/**
+	Выводит приветствующие сообщение.
+*/
 void printcopyright() {
 	cout << "VoteSystem version " << VSVERSION << endl << "Copyright (C) 2016, ShiftDj" << endl << endl;
 }

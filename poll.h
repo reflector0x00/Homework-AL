@@ -1,3 +1,7 @@
+/**
+	@file
+	@brief Заголовочный файл для класса избирательного участка
+*/
 #pragma once
 #include <iostream>
 #include <string>
@@ -6,6 +10,12 @@
 #include "voter.h"
 using namespace std;
 
+
+
+/**
+	@brief Класс избирательного участка
+	Контейнерный класс для избирателей. Наследован от vector<voter>
+*/
 class poll : public vector<voter> {
 	string name;
 	public:

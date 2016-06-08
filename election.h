@@ -1,3 +1,7 @@
+/**
+	@file
+	@brief Заголовочный файл для класса выборов
+*/
 #pragma once
 #include <iostream>
 #include <string>
@@ -7,8 +11,16 @@
 #include "poll.h"
 using namespace std;
 
+/**
+	@brief Класс исключения выборов
+	Вызывается в случае неправильного использования класса выборов
+*/
 class electionException : public exception {};
 
+/**
+	@brief Класс выборов
+	Контейнерный класс для указателей на избирателей. Наследован от vector<voter*>
+*/
 class election : public vector<voter*> {
 	size_t state;
 	size_t *votes;
